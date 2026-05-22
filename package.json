@@ -1,0 +1,9 @@
+{
+  "name": "mycookies",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "check": "node --check public/privacy-plugin-loader.js && node -e \"JSON.parse(require('fs').readFileSync('public/privacy-plugins.json', 'utf8'))\""
+  }
+}
