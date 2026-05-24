@@ -3,87 +3,125 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>mycookies / privacy.js.gripe</title>
-    <meta
-      name="description"
-      content="在线构建 mycookies 隐私 banner 配置，并生成 privacy.js.gripe 引用代码。"
-    />
+    <title>mycookies builder</title>
+    <meta name="description" content="Build privacy banner content and plugin configuration." />
+    <link rel="icon" href="/assets/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/builder.css" />
   </head>
   <body class="mode-simple">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">privacy.js.gripe</p>
-        <h1>mycookies banner builder</h1>
+      <div class="brand">
+        <img src="/assets/icon.svg" alt="" width="54" height="54" />
+        <div>
+          <p class="eyebrow" data-i18n="brandKicker">mycookies</p>
+          <h1 data-i18n="appTitle">隐私 Banner 构建器</h1>
+        </div>
       </div>
       <div class="top-actions">
-        <div class="mode-switch" role="group" aria-label="视图">
-          <button type="button" class="mode-button is-active" data-mode="simple">简化</button>
-          <button type="button" class="mode-button" data-mode="advanced">高级</button>
+        <div class="mode-switch" role="group" aria-label="视图" data-i18n-aria="viewMode">
+          <button type="button" class="mode-button is-active" data-mode="simple" data-i18n="simple">简化</button>
+          <button type="button" class="mode-button" data-mode="advanced" data-i18n="advanced">高级</button>
         </div>
-        <a class="repo-link" href="https://github.com/jsw-teams/mycookies">GitHub</a>
+        <button type="button" class="dark" id="open-export" data-i18n="export">导出</button>
       </div>
     </header>
 
-    <main class="workspace">
-      <form class="editor" id="builder-form">
-        <section class="panel">
-          <div class="section-heading">
-            <h2>基础文案</h2>
-            <div class="tabs" role="tablist" aria-label="语言">
-              <button type="button" class="tab is-active" data-lang="zh-CN">简</button>
-              <button type="button" class="tab" data-lang="zh-TW">繁</button>
-              <button type="button" class="tab" data-lang="en">EN</button>
-            </div>
+    <main class="builder-shell">
+      <aside class="panel component-rail" aria-labelledby="components-title">
+        <div class="section-heading">
+          <h2 id="components-title" data-i18n="components">组件</h2>
+          <div class="mini-actions">
+            <button type="button" class="icon-button" id="add-required" title="新增必要组件" aria-label="新增必要组件" data-i18n-title="addRequired" data-i18n-aria="addRequired">+</button>
+            <button type="button" class="icon-button" id="add-optional" title="新增可选组件" aria-label="新增可选组件" data-i18n-title="addOptional" data-i18n-aria="addOptional">◇</button>
           </div>
+        </div>
+        <div class="component-list" id="component-list"></div>
+      </aside>
+
+      <section class="panel inspector" aria-labelledby="inspector-title">
+        <div class="section-heading">
+          <h2 id="inspector-title" data-i18n="inspector">构建器组件</h2>
+          <div class="tabs" role="tablist" aria-label="语言" data-i18n-aria="language">
+            <button type="button" class="tab is-active" data-lang="zh-CN">简</button>
+            <button type="button" class="tab" data-lang="zh-TW">繁</button>
+            <button type="button" class="tab" data-lang="en">EN</button>
+          </div>
+        </div>
+
+        <form id="component-form" class="component-form">
+          <div class="type-toggle" role="group" aria-label="组件类型" data-i18n-aria="componentType">
+            <label>
+              <input type="radio" name="componentKind" value="required" />
+              <span data-i18n="required">必要</span>
+            </label>
+            <label>
+              <input type="radio" name="componentKind" value="optional" />
+              <span data-i18n="optional">可选</span>
+            </label>
+          </div>
+
           <label>
-            <span>标题</span>
+            <span data-i18n="componentName">组件名称</span>
+            <input name="componentName" autocomplete="off" />
+          </label>
+
+          <label class="advanced-only">
+            <span data-i18n="componentId">组件 ID</span>
+            <input name="componentId" autocomplete="off" />
+          </label>
+
+          <label>
+            <span data-i18n="privacyDisclosure">隐私说明</span>
+            <textarea name="componentDisclosure" rows="4"></textarea>
+          </label>
+
+          <div class="optional-fields">
+            <label>
+              <span data-i18n="scriptUrl">脚本地址</span>
+              <input name="componentSrc" autocomplete="off" />
+            </label>
+            <label class="advanced-only">
+              <span data-i18n="category">类别</span>
+              <input name="componentCategory" autocomplete="off" />
+            </label>
+            <label class="advanced-only">
+              <span data-i18n="cloudflareToken">Cloudflare token</span>
+              <input name="componentToken" autocomplete="off" />
+            </label>
+          </div>
+
+          <div class="section-heading advanced-only">
+            <h3 data-i18n="bannerCopy">Banner 文案</h3>
+          </div>
+
+          <label class="advanced-only">
+            <span data-i18n="bannerTitleLabel">标题</span>
             <input name="bannerTitle" autocomplete="off" />
           </label>
-          <label>
-            <span>说明</span>
+          <label class="advanced-only">
+            <span data-i18n="bannerMessageLabel">说明</span>
             <textarea name="bannerMessage" rows="3"></textarea>
           </label>
-          <div class="split">
+          <div class="split advanced-only">
             <label>
-              <span>最小必要按钮</span>
+              <span data-i18n="minimumButton">最小必要按钮</span>
               <input name="rejectAll" autocomplete="off" />
             </label>
             <label>
-              <span>接受按钮</span>
+              <span data-i18n="acceptButton">接受按钮</span>
               <input name="acceptAll" autocomplete="off" />
             </label>
           </div>
-          <label>
-            <span>GPC / DNT 提示</span>
-            <textarea name="gpc" rows="2"></textarea>
-          </label>
-        </section>
+        </form>
+      </section>
 
-        <section class="panel advanced-only">
+      <aside class="preview-column">
+        <section class="panel preview-panel">
           <div class="section-heading">
-            <h2>必要项目</h2>
-            <button type="button" class="ghost" id="add-required">新增</button>
+            <h2 data-i18n="preview">预览</h2>
+            <button type="button" class="ghost" id="reset-demo" data-i18n="reset">重置</button>
           </div>
-          <div class="rows" id="required-list"></div>
-        </section>
-
-        <section class="panel advanced-only">
-          <div class="section-heading">
-            <h2>可选插件</h2>
-            <button type="button" class="ghost" id="add-plugin">新增</button>
-          </div>
-          <div class="rows" id="plugin-list"></div>
-        </section>
-      </form>
-
-      <aside class="output">
-        <section class="panel preview">
-          <div class="section-heading">
-            <h2>预览</h2>
-            <button type="button" class="ghost" id="reset-demo">重置</button>
-          </div>
-          <div class="banner-preview" aria-label="banner 预览">
+          <div class="banner-preview" aria-label="banner 预览" data-i18n-aria="bannerPreview">
             <div>
               <strong id="preview-title"></strong>
               <p id="preview-message"></p>
@@ -97,36 +135,39 @@
           </div>
           <div class="preference-preview" id="preference-preview"></div>
         </section>
-
-        <section class="panel">
-          <div class="section-heading">
-            <h2>引用</h2>
-            <button type="button" class="ghost" data-copy="#snippet">复制</button>
-          </div>
-          <textarea id="snippet" class="code" rows="4" readonly></textarea>
-        </section>
-
-        <section class="panel advanced-only">
-          <div class="section-heading">
-            <h2>配置 JSON</h2>
-            <div class="actions">
-              <button type="button" class="ghost" id="import-json">导入</button>
-              <button type="button" class="ghost" data-copy="#config-json">复制</button>
-              <button type="button" class="ghost" id="download-json">下载</button>
-            </div>
-          </div>
-          <textarea id="config-json" class="code" rows="18" spellcheck="false"></textarea>
-        </section>
       </aside>
     </main>
 
+    <dialog id="export-dialog">
+      <form method="dialog" class="dialog-panel">
+        <div class="section-heading">
+          <h2 data-i18n="export">导出</h2>
+          <button value="cancel" class="ghost" data-i18n="close">关闭</button>
+        </div>
+        <div class="export-actions">
+          <button type="button" data-copy="#snippet" data-i18n="copyEmbed">复制引用代码</button>
+          <button type="button" data-copy="#config-json" data-i18n="copyConfig">复制配置</button>
+          <button type="button" id="download-json" data-i18n="downloadConfig">下载配置</button>
+          <button type="button" id="import-json" data-i18n="importConfig">导入配置</button>
+        </div>
+        <label class="advanced-only">
+          <span data-i18n="embedCode">引用代码</span>
+          <textarea id="snippet" class="code" rows="3" readonly></textarea>
+        </label>
+        <label>
+          <span data-i18n="configJson">配置 JSON</span>
+          <textarea id="config-json" class="code" rows="16" spellcheck="false"></textarea>
+        </label>
+      </form>
+    </dialog>
+
     <dialog id="import-dialog">
       <form method="dialog" class="dialog-panel">
-        <h2>导入 privacy-plugins.json</h2>
+        <h2 data-i18n="importConfig">导入配置</h2>
         <textarea id="import-source" rows="14" spellcheck="false"></textarea>
         <div class="dialog-actions">
-          <button value="cancel">取消</button>
-          <button value="apply" class="dark">应用</button>
+          <button value="cancel" data-i18n="cancel">取消</button>
+          <button value="apply" class="dark" data-i18n="apply">应用</button>
         </div>
       </form>
     </dialog>

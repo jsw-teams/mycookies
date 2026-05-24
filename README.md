@@ -2,7 +2,7 @@
 
 `mycookies` is a small, dependency-free privacy banner controller for static sites and web apps. It gates optional third-party scripts, stores the visitor's choice in `localStorage`, provides a preference center, and includes accessible dialog markup and keyboard behavior.
 
-This is a compliance-oriented implementation helper, not legal advice. Review your final configuration with counsel for the regions where you operate.
+It was built for the JS.Gripe sites, but the public files in this repository can be deployed on any static host.
 
 The hosted builder lives at `https://privacy.js.gripe/`. It opens in a simplified view for everyday banner copy, preview, and embed code. Switch to Advanced when you need to edit required-service disclosures, optional plugins, imports, or raw JSON.
 
@@ -11,12 +11,12 @@ The hosted builder lives at `https://privacy.js.gripe/`. It opens in a simplifie
 - Shows a first-run privacy choices banner.
 - Lets visitors keep only required services, accept all, or manage preferences by category.
 - Loads optional scripts only after the matching category is accepted.
-- Displays required services separately from optional categories.
+- Displays required services separately from optional categories, so visitors can see what is necessary for site operation.
 - Stores consent in `privacy_plugins_consent_v4`.
 - Migrates all-off legacy `privacy_plugins_consent_v3` choices.
 - Detects Global Privacy Control and Do Not Track as an opt-out signal, so optional plugins start off by default.
-- Keeps analytics optional under GPC/DNT instead of turning it into an unchangeable required item.
-- Avoids initial auto-focus on action buttons.
+- Keeps analytics as an optional category under GPC/DNT: it is still labeled optional and can still be changed in the preference center.
+- Avoids initial auto-focus on banner buttons, so the first paint does not show a blue focus ring on "Only necessary" or other actions.
 - Supports `aria-labelledby`, `aria-describedby`, `aria-modal`, focus handling, Escape close, and visible keyboard focus states.
 
 ## Files
@@ -26,18 +26,22 @@ The deployable files are in `public/`:
 - `index.html`
 - `builder.css`
 - `builder.js`
-- `demo.html`
 - `privacy-plugin-loader.js`
 - `privacy-plugin-banner.css`
 - `privacy-plugins.json`
 - `_headers`
+
+The helper scripts are in `scripts/`:
+
+- `sync-to-projects.mjs`: copies the canonical files into JS.Gripe project folders.
+- `capture-smoke-screenshots.mjs`: starts local static previews and captures pre-release UI screenshots.
 
 ## Quick Deploy
 
 The simplest integration is to reference the hosted loader before `</body>`:
 
 ```html
-<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1" defer></script>
+<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v2" defer></script>
 ```
 
 When loaded from `privacy.js.gripe`, the loader automatically fetches `https://privacy.js.gripe/privacy-plugins.json` and `https://privacy.js.gripe/privacy-plugin-banner.css`.
@@ -46,7 +50,7 @@ If you self-host the files or keep a site-specific config somewhere else, pass U
 
 ```html
 <script
-  src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1"
+  src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v2"
   data-config="/assets/privacy-plugins.json"
   data-stylesheet="/assets/privacy-plugin-banner.css"
   defer
@@ -60,7 +64,7 @@ Use a version query string when you deploy a new banner build so browsers and CD
 `mycookies` 可以直接使用线上版本，不依赖框架。先在 `https://privacy.js.gripe/` 可视化编辑 banner 内容、必要项目和可选插件，再把生成的 `privacy-plugins.json` 发布到 `privacy.js.gripe` 的静态文件中。业务站点只需要在页面底部引用：
 
 ```html
-<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1" defer></script>
+<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v2" defer></script>
 ```
 
 默认情况下，loader 会自动从同一域名读取：
@@ -72,7 +76,7 @@ Use a version query string when you deploy a new banner build so browsers and CD
 
 ```html
 <script
-  src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1"
+  src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v2"
   data-config="https://example.com/privacy-plugins.json"
   data-stylesheet="https://example.com/privacy-plugin-banner.css"
   defer
@@ -124,6 +128,13 @@ Minimal example:
       "name": "Privacy choice storage",
       "disclosure": {
         "en": "Privacy choice storage: remembers your only-necessary, accept-all, or custom preference in this browser so the banner does not repeat on every refresh."
+      }
+    },
+    {
+      "id": "site-operation-security-session",
+      "name": "Site operation, security, and session",
+      "disclosure": {
+        "en": "Site operation, security, and session: supports requested pages, account login state, basic security protections, language preference, and service continuity."
       }
     }
   ],
@@ -203,31 +214,16 @@ Minimal example:
 }
 ```
 
-## Required Services
+## Region And Consent Modes
 
-Some jurisdictions and regulators expect clear disclosure of storage/access that is necessary for the requested service, even when consent is not requested for those items. `mycookies` supports this with `requiredServices`.
+Each plugin can use:
 
-Required services are shown in the preference center as checked and disabled. They are separate from optional categories such as analytics. Use them only for genuinely necessary purposes such as:
+- `always-prompt`: always ask before loading.
+- `never-prompt`: load without the banner gate.
+- `region-aware`: ask in consent-focused regions and conservative fallback regions.
+- `consent`: ask when the region/country rule says consent is needed.
 
-- remembering the privacy choice itself;
-- account session continuity;
-- security and abuse prevention;
-- language, accessibility, or UI preference needed to provide the requested page;
-- service continuity for the current request.
-
-Do not place analytics, advertising, cross-site tracking, A/B testing, heatmaps, remarketing, or convenience-only features in `requiredServices`.
-
-### 必要项目合规边界
-
-通常可以放入 `requiredServices` 的，是为了提供用户正在请求的页面或服务而不可缺少的项目，例如：
-
-- 隐私选择本身的存储；
-- 登录会话、CSRF 防护、基础安全、防滥用和故障排查；
-- 站点路由、负载均衡、CDN 安全、服务可用性；
-- 语言、无障碍或界面偏好，且这些偏好是提供当前页面所必需的；
-- 购物车、表单草稿、账户安全通知等用户明确请求流程中的必要状态。
-
-不要放入必要项目的包括：访问统计、A/B 测试、广告、再营销、跨站跟踪、社交分享追踪、热力图、个性化推荐、便利性但非必要的小组件。面对欧盟/英国、加拿大、巴西、加州、澳大利亚、香港、台湾、日本、韩国、新加坡、中国大陆等不同地区访客时，建议采用更保守做法：必要项目清楚披露，可选项目先选择后加载，并允许撤回。
+The default JS.Gripe config uses `always-prompt` for optional analytics.
 
 ## Global Privacy Control And Do Not Track
 
@@ -240,6 +236,32 @@ When `navigator.globalPrivacyControl`, `navigator.doNotTrack`, or `window.doNotT
 - The visitor can still keep only required services, accept all, or save custom choices.
 
 This avoids turning analytics into an unchangeable "Required" item while still respecting the browser-level signal as the default state.
+
+## Required Services
+
+Some jurisdictions and regulators expect clear disclosure of storage/access that is necessary for the requested service, even when consent is not requested for those items. `mycookies` supports this with `requiredServices`.
+
+Required services are shown in the preference center as checked and disabled. They are separate from optional categories such as analytics. Use them only for genuinely necessary purposes such as:
+
+- remembering the privacy choice itself;
+- account session continuity;
+- security and abuse prevention;
+- language or UI preference needed to provide the requested page;
+- service continuity for the current request.
+
+Do not place analytics, advertising, cross-site tracking, or convenience-only features in `requiredServices`.
+
+### 必要项目合规边界
+
+通常可以放入 `requiredServices` 的，是为了提供用户正在请求的页面或服务而不可缺少的项目，例如：
+
+- 隐私选择本身的存储；
+- 登录会话、CSRF 防护、基础安全、防滥用和故障排查；
+- 站点路由、负载均衡、CDN 安全、服务可用性；
+- 语言、无障碍或界面偏好，且这些偏好是提供当前页面所必需的；
+- 购物车、表单草稿、账户安全通知等用户明确请求流程中的必要状态。
+
+不要放入必要项目的包括：访问统计、A/B 测试、广告、再营销、跨站跟踪、社交分享追踪、热力图、个性化推荐、便利性但非必要的小组件。面对欧盟/英国、加拿大、巴西、加州、澳大利亚、香港、台湾、日本、韩国、新加坡、中国大陆等不同地区访客时，建议采用更保守做法：必要项目清楚披露，可选项目先选择后加载，并允许撤回。
 
 ## Styling
 
@@ -273,6 +295,47 @@ window.JSGripePrivacy.reset();
 
 Use `openPreferences()` from a footer "Privacy settings" link if you prefer a custom trigger.
 
+## JS.Gripe Project Sync
+
+Inside this monorepo/server layout, run:
+
+```bash
+cd /opt/mycookies
+npm run sync
+```
+
+The sync applies the banner files to:
+
+- `/opt/account-system/public`
+- `/opt/myblog/src`
+- `/opt/myblog/static/assets`
+- `/opt/dquery/frontend/public`
+- `/opt/myfiles/frontend/public/app`
+- `/opt/myweb/public`
+
+If build output already exists, it also refreshes:
+
+- `/opt/myblog/public/assets`
+- `/opt/dquery/frontend/dist`
+- `/opt/myfiles/frontend/dist/app`
+- `/opt/myweb/dist`
+
+Each JS.Gripe project also has a `sync:cookies` script that calls the same shared sync entry.
+
+## Pre-Release Smoke Test
+
+Run:
+
+```bash
+cd /opt/mycookies
+npm run check
+npm run capture:smoke
+```
+
+`capture:smoke` starts the public demo page, clears consent storage, and captures banner and preference-center screenshots.
+
+Screenshots are written to `docs/screenshots/`.
+
 ## Screenshots
 
 ### Visual Builder
@@ -292,12 +355,6 @@ Use `openPreferences()` from a footer "Privacy settings" link if you prefer a cu
 This screenshot is captured with `navigator.globalPrivacyControl === true`. Required services are disclosed separately, and analytics remains optional and selectable.
 
 ![GPC preference center](docs/screenshots/demo-gpc-preferences.png)
-
-## Check
-
-```bash
-npm run check
-```
 
 ## Browser Support
 
