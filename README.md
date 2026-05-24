@@ -4,7 +4,7 @@
 
 It was built for the JS.Gripe sites, but the public files in this repository can be deployed on any static host.
 
-The hosted builder lives at `https://privacy.js.gripe/`. It opens in a simplified view for everyday banner copy, preview, and embed code. Switch to Advanced when you need to edit required-service disclosures, optional plugins, imports, or raw JSON.
+The hosted builder lives at `https://privacy.js.gripe/`. It opens as a single-column component builder with preview, required-service disclosures, optional plugins, imports, and raw JSON export in one focused flow.
 
 ## What It Does
 
@@ -146,8 +146,7 @@ Minimal example:
       "type": "script",
       "src": "https://static.cloudflareinsights.com/beacon.min.js",
       "attributes": {
-        "defer": true,
-        "data-cf-beacon": "{\"token\":\"YOUR_TOKEN\"}"
+        "defer": true
       },
       "policy": {
         "category": "analytics",

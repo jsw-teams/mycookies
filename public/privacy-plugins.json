@@ -121,8 +121,7 @@
       "type": "script",
       "src": "https://static.cloudflareinsights.com/beacon.min.js",
       "attributes": {
-        "defer": true,
-        "data-cf-beacon": "{\"token\":\"4349c15d66d44f79b7d07f89c1e491ab\"}"
+        "defer": true
       },
       "disclosure": "Cloudflare Web Analytics: used to measure page visits, performance, and basic usage trends. Provider: Cloudflare. Category: analytics. Non-essential and loaded only after consent. Not used for targeted advertising or cross-site tracking.",
       "policy": {

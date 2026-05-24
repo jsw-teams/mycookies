@@ -5,15 +5,12 @@ const chromeCopy = {
     metaDescription: "可视化构建隐私 banner 内容、必要项目和可选插件配置。",
     brandKicker: "mycookies",
     appTitle: "隐私 Banner 构建器",
-    simple: "简化",
-    advanced: "高级",
     export: "导出",
     components: "组件",
     addRequired: "新增必要组件",
     addOptional: "新增可选组件",
     inspector: "构建器组件",
     language: "语言",
-    viewMode: "视图",
     componentType: "组件类型",
     required: "必要",
     optional: "可选",
@@ -22,7 +19,6 @@ const chromeCopy = {
     privacyDisclosure: "隐私说明",
     scriptUrl: "脚本地址",
     category: "类别",
-    cloudflareToken: "Cloudflare token",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "标题",
     bannerMessageLabel: "说明",
@@ -49,15 +45,12 @@ const chromeCopy = {
     metaDescription: "視覺化建立隱私 banner 內容、必要項目與可選外掛配置。",
     brandKicker: "mycookies",
     appTitle: "隱私 Banner 建構器",
-    simple: "簡化",
-    advanced: "進階",
     export: "匯出",
     components: "組件",
     addRequired: "新增必要組件",
     addOptional: "新增可選組件",
     inspector: "建構器組件",
     language: "語言",
-    viewMode: "檢視",
     componentType: "組件類型",
     required: "必要",
     optional: "可選",
@@ -66,7 +59,6 @@ const chromeCopy = {
     privacyDisclosure: "隱私說明",
     scriptUrl: "腳本地址",
     category: "類別",
-    cloudflareToken: "Cloudflare token",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "標題",
     bannerMessageLabel: "說明",
@@ -93,15 +85,12 @@ const chromeCopy = {
     metaDescription: "Visually build privacy banner copy, required services, and optional plugin configuration.",
     brandKicker: "mycookies",
     appTitle: "Privacy Banner Builder",
-    simple: "Simple",
-    advanced: "Advanced",
     export: "Export",
     components: "Components",
     addRequired: "Add required component",
     addOptional: "Add optional component",
     inspector: "Builder Component",
     language: "Language",
-    viewMode: "View",
     componentType: "Component type",
     required: "Required",
     optional: "Optional",
@@ -110,7 +99,6 @@ const chromeCopy = {
     privacyDisclosure: "Privacy disclosure",
     scriptUrl: "Script URL",
     category: "Category",
-    cloudflareToken: "Cloudflare token",
     bannerCopy: "Banner copy",
     bannerTitleLabel: "Title",
     bannerMessageLabel: "Description",
@@ -233,7 +221,6 @@ const state = {
       name: "Cloudflare Web Analytics",
       src: "https://static.cloudflareinsights.com/beacon.min.js",
       category: "analytics",
-      token: "YOUR_TOKEN",
       disclosure: {
         "zh-CN": "用于统计页面访问量和性能，不用于定向广告。",
         "zh-TW": "用於統計頁面訪問量和效能，不用於廣告定向。",
@@ -344,7 +331,6 @@ function syncFormToState() {
   if (component.kind === "optional") {
     component.src = data.get("componentSrc") || "";
     component.category = data.get("componentCategory") || "analytics";
-    component.token = data.get("componentToken") || "";
   }
 
   const copy = state.ui[state.activeLang];
@@ -375,7 +361,6 @@ function renderForm() {
   form.elements.componentDisclosure.value = localized(component.disclosure);
   form.elements.componentSrc.value = component.src || "";
   form.elements.componentCategory.value = component.category || "analytics";
-  form.elements.componentToken.value = component.token || "";
   const copy = state.ui[state.activeLang];
   form.elements.bannerTitle.value = copy.bannerTitle;
   form.elements.bannerMessage.value = copy.bannerMessage;
@@ -385,7 +370,6 @@ function renderForm() {
 
 function componentToPlugin(component) {
   const attributes = { defer: true };
-  if (component.token) attributes["data-cf-beacon"] = JSON.stringify({ token: component.token });
   return {
     id: component.id,
     name: component.name,
@@ -467,7 +451,6 @@ function addComponent(kind) {
     name: kind === "required" ? text.requiredDefaultName : text.optionalDefaultName,
     src: kind === "optional" ? "https://example.com/plugin.js" : "",
     category: "analytics",
-    token: "",
     disclosure: { [state.activeLang]: "" }
   });
   state.selectedId = id;
@@ -490,22 +473,12 @@ function importConfig(config) {
       name: plugin.name,
       src: plugin.src || "",
       category: plugin.policy?.category || "analytics",
-      token: parseBeaconToken(plugin.attributes?.["data-cf-beacon"]),
       disclosure: plugin.disclosure || {}
     }))
   ];
   state.selectedId = state.components[0]?.id || "";
   renderForm();
   refresh();
-}
-
-function parseBeaconToken(value) {
-  if (!value) return "";
-  try {
-    return JSON.parse(value).token || "";
-  } catch {
-    return "";
-  }
 }
 
 componentList.addEventListener("click", (event) => {
@@ -535,15 +508,6 @@ document.querySelectorAll("[data-lang]").forEach((tab) => {
     state.activeLang = tab.dataset.lang;
     renderForm();
     refresh();
-  });
-});
-
-document.querySelectorAll("[data-mode]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const mode = button.dataset.mode;
-    document.body.classList.toggle("mode-simple", mode === "simple");
-    document.body.classList.toggle("mode-advanced", mode === "advanced");
-    document.querySelectorAll("[data-mode]").forEach((item) => item.classList.toggle("is-active", item === button));
   });
 });
 

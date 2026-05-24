@@ -168,8 +168,10 @@ async function captureGlobalOptOutPreferenceCenter(page, preview) {
 async function captureBuilder(page, preview) {
   const baseUrl = `http://127.0.0.1:${preview.port}`;
   console.log("Capturing builder...");
+  await page.setViewportSize({ width: 980, height: 1100 });
   await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
   await page.waitForSelector("#component-list .component-card", { timeout: 8000 });
+  await page.locator("[data-lang='zh-CN']").click();
   await page.screenshot({
     path: path.join(outputDir, "builder.png"),
     fullPage: true
