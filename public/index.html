@@ -3,8 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>mycookies builder</title>
+    <title>Privacy Banner Builder</title>
     <meta name="description" content="Build privacy banner content and plugin configuration." />
+    <link rel="canonical" href="https://privacy.js.gripe/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Privacy Banner Builder" />
+    <meta property="og:description" content="Build privacy banner content, validate plugin configuration, and preview consent UI." />
+    <meta property="og:url" content="https://privacy.js.gripe/" />
+    <meta property="og:image" content="https://privacy.js.gripe/assets/icon.svg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Privacy Banner Builder" />
+    <meta name="twitter:description" content="Build privacy banner content, validate plugin configuration, and preview consent UI." />
     <link rel="icon" href="/assets/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/builder.css" />
   </head>
@@ -13,7 +22,6 @@
       <div class="brand">
         <img src="/assets/icon.svg" alt="" width="54" height="54" />
         <div>
-          <p class="eyebrow" data-i18n="brandKicker">mycookies</p>
           <h1 data-i18n="appTitle">隐私 Banner 构建器</h1>
         </div>
       </div>
@@ -126,6 +134,24 @@
             </div>
           </div>
           <div class="preference-preview" id="preference-preview"></div>
+        </section>
+        <section class="panel validation-panel" aria-labelledby="validation-title">
+          <div class="section-heading">
+            <h2 id="validation-title" data-i18n="validation">配置验证</h2>
+            <span class="status-pill" id="validation-status"></span>
+          </div>
+          <div class="validation-grid">
+            <div>
+              <strong id="validation-required-count">0</strong>
+              <small data-i18n="requiredCount">必要项目</small>
+            </div>
+            <div>
+              <strong id="validation-optional-count">0</strong>
+              <small data-i18n="optionalCount">可选插件</small>
+            </div>
+          </div>
+          <p class="validation-source" id="validation-source"></p>
+          <ul class="validation-list" id="validation-list"></ul>
         </section>
       </aside>
     </main>

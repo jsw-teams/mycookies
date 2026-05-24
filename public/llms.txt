@@ -1,0 +1,17 @@
+# Privacy Banner Builder
+
+Privacy Banner Builder is a static visual builder for consent banner copy, required-service disclosures, optional plugin configuration, JSON validation, and live preview.
+
+## Key URLs
+
+- Builder: https://privacy.js.gripe/
+- Demo: https://privacy.js.gripe/demo.html
+- Loader: https://privacy.js.gripe/privacy-plugin-loader.js
+- Default config: https://privacy.js.gripe/privacy-plugins.json
+- Stylesheet: https://privacy.js.gripe/privacy-plugin-banner.css
+
+## Notes for AI Agents
+
+- Required services should be limited to site operation, security, session continuity, language preferences, and privacy-choice storage.
+- Optional plugins should load only after consent and should not include secrets or provider tokens in public JSON.
+- The builder validates public configuration and previews the banner UI in real time.

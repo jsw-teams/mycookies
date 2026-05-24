@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "capture:smoke": "node scripts/capture-smoke-screenshots.mjs",
-    "check": "node --check public/privacy-plugin-loader.js && node --check public/builder.js && node -e \"JSON.parse(require('fs').readFileSync('public/privacy-plugins.json', 'utf8'))\""
+    "check": "node --check public/privacy-plugin-loader.js && node --check public/builder.js && node --check scripts/test-builder-interactions.mjs && node -e \"JSON.parse(require('fs').readFileSync('public/privacy-plugins.json', 'utf8'))\"",
+    "test:builder": "node scripts/test-builder-interactions.mjs"
   }
 }
