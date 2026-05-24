@@ -205,6 +205,11 @@ label > span {
   font-weight: 900;
 }
 
+label > small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 input,
 textarea {
   width: 100%;

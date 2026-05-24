@@ -18,6 +18,8 @@ const chromeCopy = {
     privacyDisclosure: "隐私说明",
     scriptUrl: "脚本地址",
     category: "类别",
+    componentToken: "组件 token（可选）",
+    componentTokenHint: "按组件提供方要求填写；不需要 token 的组件可留空。",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "标题",
     bannerMessageLabel: "说明",
@@ -47,7 +49,6 @@ const chromeCopy = {
     missingUi: "缺少当前语言的 UI 文案。",
     missingRequired: "至少需要一个必要项目说明。",
     missingPluginSrc: "可选插件需要填写脚本地址。",
-    tokenNotAllowed: "配置中不应包含 token 或 data-cf-beacon，请在部署环境中注入敏感值。",
     invalidJson: "JSON 无法解析，实时预览已保留上一次有效配置。",
     requiredDefaultName: "必要服务",
     optionalDefaultName: "可选插件"
@@ -70,6 +71,8 @@ const chromeCopy = {
     privacyDisclosure: "隱私說明",
     scriptUrl: "腳本地址",
     category: "類別",
+    componentToken: "組件 token（可選）",
+    componentTokenHint: "依組件提供方要求填寫；不需要 token 的組件可留空。",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "標題",
     bannerMessageLabel: "說明",
@@ -99,7 +102,6 @@ const chromeCopy = {
     missingUi: "缺少目前語言的 UI 文案。",
     missingRequired: "至少需要一個必要項目說明。",
     missingPluginSrc: "可選外掛需要填寫腳本地址。",
-    tokenNotAllowed: "配置中不應包含 token 或 data-cf-beacon，請在部署環境中注入敏感值。",
     invalidJson: "JSON 無法解析，即時預覽已保留上一個有效配置。",
     requiredDefaultName: "必要服務",
     optionalDefaultName: "可選外掛"
@@ -122,6 +124,8 @@ const chromeCopy = {
     privacyDisclosure: "Privacy disclosure",
     scriptUrl: "Script URL",
     category: "Category",
+    componentToken: "Component token (optional)",
+    componentTokenHint: "Fill only when the component provider requires one; leave blank otherwise.",
     bannerCopy: "Banner copy",
     bannerTitleLabel: "Title",
     bannerMessageLabel: "Description",
@@ -151,7 +155,6 @@ const chromeCopy = {
     missingUi: "UI copy is missing for the active language.",
     missingRequired: "Add at least one required-service disclosure.",
     missingPluginSrc: "Optional plugins need a script URL.",
-    tokenNotAllowed: "Do not include token or data-cf-beacon values in config; inject secrets at deploy time.",
     invalidJson: "JSON could not be parsed, so live preview kept the last valid config.",
     requiredDefaultName: "Required service",
     optionalDefaultName: "Optional plugin"
@@ -257,6 +260,7 @@ const state = {
       name: "Cloudflare Web Analytics",
       src: "https://static.cloudflareinsights.com/beacon.min.js",
       category: "analytics",
+      token: "",
       disclosure: {
         "zh-CN": "用于统计页面访问量和性能，不用于定向广告。",
         "zh-TW": "用於統計頁面訪問量和效能，不用於廣告定向。",
@@ -372,6 +376,7 @@ function syncFormToState() {
   if (component.kind === "optional") {
     component.src = data.get("componentSrc") || "";
     component.category = data.get("componentCategory") || "analytics";
+    component.token = data.get("componentToken") || "";
   }
 
   const copy = state.ui[state.activeLang];
@@ -402,6 +407,7 @@ function renderForm() {
   form.elements.componentDisclosure.value = localized(component.disclosure);
   form.elements.componentSrc.value = component.src || "";
   form.elements.componentCategory.value = component.category || "analytics";
+  form.elements.componentToken.value = component.token || "";
   const copy = state.ui[state.activeLang];
   form.elements.bannerTitle.value = copy.bannerTitle;
   form.elements.bannerMessage.value = copy.bannerMessage;
@@ -411,6 +417,7 @@ function renderForm() {
 
 function componentToPlugin(component) {
   const attributes = { defer: true };
+  if (component.token) attributes["data-cf-beacon"] = JSON.stringify({ token: component.token });
   return {
     id: component.id,
     name: component.name,
@@ -456,7 +463,7 @@ function renderPreview(config) {
   document.querySelector("#preview-customize").textContent = copy.customize;
   document.querySelector("#preview-accept").textContent = copy.acceptAll;
   document.querySelector("#preference-preview").innerHTML = [
-    `<div class="pref-row"><input type="checkbox" checked disabled /><div><strong>${escapeHtml(copy.requiredServicesTitle)}</strong><br /><small>${escapeHtml(copy.requiredServicesDescription)}</small></div><em>${escapeHtml(copy.required)}</em></div>`,
+    ...config.requiredServices.map((service) => `<div class="pref-row"><input type="checkbox" checked disabled /><div><strong>${escapeHtml(service.name || service.id)}</strong><br /><small>${escapeHtml(localized(service.disclosure))}</small></div><em>${escapeHtml(copy.required)}</em></div>`),
     ...config.plugins.map((plugin) => `<div class="pref-row"><input type="checkbox" /><div><strong>${escapeHtml(plugin.name)}</strong><br /><small>${escapeHtml(localized(plugin.disclosure))}</small></div><em>${escapeHtml(copy.optional)}</em></div>`)
   ].join("");
 }
@@ -470,7 +477,6 @@ function validateConfig(config, parseError = null) {
   (config?.plugins || []).forEach((plugin) => {
     if (plugin?.enabled !== false && !plugin?.src) errors.push(`${plugin?.name || plugin?.id || text.optional}: ${text.missingPluginSrc}`);
   });
-  if (/data-cf-beacon|token/i.test(JSON.stringify(config || {}))) errors.push(text.tokenNotAllowed);
   return {
     ok: errors.length === 0,
     errors,
@@ -495,7 +501,7 @@ function refresh() {
   const config = buildConfig();
   applyChrome();
   configJson.value = JSON.stringify(config, null, 2);
-  snippet.value = '<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v2" defer></script>';
+  snippet.value = '<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v3" defer></script>';
   renderComponentList();
   renderPreview(config);
   renderValidation(validateConfig(config), "previewFromBuilder");
@@ -523,6 +529,7 @@ function addComponent(kind) {
     name: kind === "required" ? text.requiredDefaultName : text.optionalDefaultName,
     src: kind === "optional" ? "https://example.com/plugin.js" : "",
     category: "analytics",
+    token: "",
     disclosure: { [state.activeLang]: "" }
   });
   state.selectedId = id;
@@ -545,12 +552,22 @@ function importConfig(config) {
       name: plugin.name,
       src: plugin.src || "",
       category: plugin.policy?.category || "analytics",
+      token: parseBeaconToken(plugin.attributes?.["data-cf-beacon"]),
       disclosure: plugin.disclosure || {}
     }))
   ];
   state.selectedId = state.components[0]?.id || "";
   renderForm();
   refresh();
+}
+
+function parseBeaconToken(value) {
+  if (!value) return "";
+  try {
+    return JSON.parse(value).token || "";
+  } catch {
+    return "";
+  }
 }
 
 componentList.addEventListener("click", (event) => {

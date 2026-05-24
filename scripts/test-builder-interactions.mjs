@@ -85,6 +85,16 @@ try {
   assert.equal(config.requiredServices.length, 2);
   assert.equal(config.plugins.length, 1);
   assert.ok(!/token|data-cf-beacon/i.test(jsonText), "Exported config should not contain token fields");
+  await page.locator("#export-dialog button[value='cancel']").click();
+  await page.waitForFunction(() => !document.querySelector("#export-dialog")?.open, { timeout: 4000 });
+
+  await page.locator("[data-select='cloudflare-web-analytics']").click();
+  await page.locator("input[name='componentToken']").fill("TEST_TOKEN");
+  await page.locator("#open-export").click();
+  await page.waitForSelector("#export-dialog[open]", { timeout: 4000 });
+  const tokenConfigText = await page.locator("#config-json").inputValue();
+  assert.match(tokenConfigText, /data-cf-beacon/);
+  assert.match(tokenConfigText, /TEST_TOKEN/);
 
   const downloadPromise = page.waitForEvent("download");
   await page.locator("#download-json").click();
@@ -114,7 +124,6 @@ try {
   await page.waitForFunction(() => !document.querySelector("#import-dialog")?.open, { timeout: 4000 });
   await expectText(page.locator("#preview-title"), "测试隐私选择");
   await expectText(page.locator("#validation-status"), "有效");
-
   await page.locator("#export-dialog button[value='cancel']").click();
   await page.waitForFunction(() => !document.querySelector("#export-dialog")?.open, { timeout: 4000 });
 
