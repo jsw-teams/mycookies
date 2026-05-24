@@ -94,7 +94,6 @@ textarea:focus-visible {
 .preview-actions,
 .dialog-actions,
 .export-actions,
-.form-actions,
 .split {
   display: flex;
   gap: 10px;
@@ -159,23 +158,18 @@ h3 {
 }
 
 .icon-button {
+  display: inline-grid;
+  place-items: center;
   width: 38px;
   padding: 0;
 }
 
 .component-list,
 .component-form,
-.form-actions,
 .preference-preview,
 .preview-column {
   display: grid;
   gap: 10px;
-}
-
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
 }
 
 .component-list {

@@ -6,8 +6,7 @@ const chromeCopy = {
     appTitle: "隐私 Banner 构建器",
     export: "导出",
     components: "组件",
-    addRequired: "新增必要组件",
-    addOptional: "新增可选组件",
+    addComponent: "新增组件",
     inspector: "构建器组件",
     language: "语言",
     componentType: "组件类型",
@@ -20,7 +19,6 @@ const chromeCopy = {
     category: "类别",
     componentToken: "组件 token（可选）",
     componentTokenHint: "按组件提供方要求填写；不需要 token 的组件可留空。",
-    saveComponent: "保存组件",
     deleteComponent: "删除组件",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "标题",
@@ -61,8 +59,7 @@ const chromeCopy = {
     appTitle: "隱私 Banner 建構器",
     export: "匯出",
     components: "組件",
-    addRequired: "新增必要組件",
-    addOptional: "新增可選組件",
+    addComponent: "新增組件",
     inspector: "建構器組件",
     language: "語言",
     componentType: "組件類型",
@@ -75,7 +72,6 @@ const chromeCopy = {
     category: "類別",
     componentToken: "組件 token（可選）",
     componentTokenHint: "依組件提供方要求填寫；不需要 token 的組件可留空。",
-    saveComponent: "儲存組件",
     deleteComponent: "刪除組件",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "標題",
@@ -116,8 +112,7 @@ const chromeCopy = {
     appTitle: "Privacy Banner Builder",
     export: "Export",
     components: "Components",
-    addRequired: "Add required component",
-    addOptional: "Add optional component",
+    addComponent: "Add component",
     inspector: "Builder Component",
     language: "Language",
     componentType: "Component type",
@@ -130,7 +125,6 @@ const chromeCopy = {
     category: "Category",
     componentToken: "Component token (optional)",
     componentTokenHint: "Fill only when the component provider requires one; leave blank otherwise.",
-    saveComponent: "Save component",
     deleteComponent: "Delete component",
     bannerCopy: "Banner copy",
     bannerTitleLabel: "Title",
@@ -602,13 +596,7 @@ form.addEventListener("input", () => {
   refresh();
 });
 
-document.querySelector("#add-required").addEventListener("click", () => addComponent("required"));
-document.querySelector("#add-optional").addEventListener("click", () => addComponent("optional"));
-document.querySelector("#save-component").addEventListener("click", () => {
-  syncFormToState();
-  renderForm();
-  refresh();
-});
+document.querySelector("#add-component").addEventListener("click", () => addComponent("optional"));
 deleteComponentButton.addEventListener("click", deleteSelectedComponent);
 document.querySelector("#reset-demo").addEventListener("click", () => {
   localStorage.removeItem("mycookies_builder_state_v2");

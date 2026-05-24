@@ -91,7 +91,6 @@ try {
   await page.locator("[data-select='cloudflare-web-analytics']").click();
   await page.locator("input[name='componentToken']").fill("TEST_TOKEN");
   await page.locator("input[name='componentName']").fill("Cloudflare Analytics Edited");
-  await page.locator("#save-component").click();
   await expectText(page.locator("[data-select='cloudflare-web-analytics']"), "Cloudflare Analytics Edited");
   await page.locator("#open-export").click();
   await page.waitForSelector("#export-dialog[open]", { timeout: 4000 });
@@ -131,7 +130,7 @@ try {
   await page.waitForFunction(() => !document.querySelector("#export-dialog")?.open, { timeout: 4000 });
 
   const beforeCount = await page.locator("#component-list .component-card").count();
-  await page.locator("#add-optional").click();
+  await page.locator("#add-component").click();
   assert.equal(await page.locator("#component-list .component-card").count(), beforeCount + 1);
   await page.locator("input[name='componentSrc']").fill("");
   await expectText(page.locator("#validation-status"), "需修正");
