@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>mycookies / privacy.js.gripe</title>
+    <meta
+      name="description"
+      content="在线构建 mycookies 隐私 banner 配置，并生成 privacy.js.gripe 引用代码。"
+    />
+    <link rel="stylesheet" href="/builder.css" />
+  </head>
+  <body class="mode-simple">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">privacy.js.gripe</p>
+        <h1>mycookies banner builder</h1>
+      </div>
+      <div class="top-actions">
+        <div class="mode-switch" role="group" aria-label="视图">
+          <button type="button" class="mode-button is-active" data-mode="simple">简化</button>
+          <button type="button" class="mode-button" data-mode="advanced">高级</button>
+        </div>
+        <a class="repo-link" href="https://github.com/jsw-teams/mycookies">GitHub</a>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <form class="editor" id="builder-form">
+        <section class="panel">
+          <div class="section-heading">
+            <h2>基础文案</h2>
+            <div class="tabs" role="tablist" aria-label="语言">
+              <button type="button" class="tab is-active" data-lang="zh-CN">简</button>
+              <button type="button" class="tab" data-lang="zh-TW">繁</button>
+              <button type="button" class="tab" data-lang="en">EN</button>
+            </div>
+          </div>
+          <label>
+            <span>标题</span>
+            <input name="bannerTitle" autocomplete="off" />
+          </label>
+          <label>
+            <span>说明</span>
+            <textarea name="bannerMessage" rows="3"></textarea>
+          </label>
+          <div class="split">
+            <label>
+              <span>最小必要按钮</span>
+              <input name="rejectAll" autocomplete="off" />
+            </label>
+            <label>
+              <span>接受按钮</span>
+              <input name="acceptAll" autocomplete="off" />
+            </label>
+          </div>
+          <label>
+            <span>GPC / DNT 提示</span>
+            <textarea name="gpc" rows="2"></textarea>
+          </label>
+        </section>
+
+        <section class="panel advanced-only">
+          <div class="section-heading">
+            <h2>必要项目</h2>
+            <button type="button" class="ghost" id="add-required">新增</button>
+          </div>
+          <div class="rows" id="required-list"></div>
+        </section>
+
+        <section class="panel advanced-only">
+          <div class="section-heading">
+            <h2>可选插件</h2>
+            <button type="button" class="ghost" id="add-plugin">新增</button>
+          </div>
+          <div class="rows" id="plugin-list"></div>
+        </section>
+      </form>
+
+      <aside class="output">
+        <section class="panel preview">
+          <div class="section-heading">
+            <h2>预览</h2>
+            <button type="button" class="ghost" id="reset-demo">重置</button>
+          </div>
+          <div class="banner-preview" aria-label="banner 预览">
+            <div>
+              <strong id="preview-title"></strong>
+              <p id="preview-message"></p>
+              <small id="preview-gpc"></small>
+            </div>
+            <div class="preview-actions">
+              <button type="button" id="preview-reject"></button>
+              <button type="button" id="preview-customize"></button>
+              <button type="button" class="dark" id="preview-accept"></button>
+            </div>
+          </div>
+          <div class="preference-preview" id="preference-preview"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <h2>引用</h2>
+            <button type="button" class="ghost" data-copy="#snippet">复制</button>
+          </div>
+          <textarea id="snippet" class="code" rows="4" readonly></textarea>
+        </section>
+
+        <section class="panel advanced-only">
+          <div class="section-heading">
+            <h2>配置 JSON</h2>
+            <div class="actions">
+              <button type="button" class="ghost" id="import-json">导入</button>
+              <button type="button" class="ghost" data-copy="#config-json">复制</button>
+              <button type="button" class="ghost" id="download-json">下载</button>
+            </div>
+          </div>
+          <textarea id="config-json" class="code" rows="18" spellcheck="false"></textarea>
+        </section>
+      </aside>
+    </main>
+
+    <dialog id="import-dialog">
+      <form method="dialog" class="dialog-panel">
+        <h2>导入 privacy-plugins.json</h2>
+        <textarea id="import-source" rows="14" spellcheck="false"></textarea>
+        <div class="dialog-actions">
+          <button value="cancel">取消</button>
+          <button value="apply" class="dark">应用</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="/builder.js"></script>
+  </body>
+</html>

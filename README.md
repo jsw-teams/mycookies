@@ -4,6 +4,8 @@
 
 This is a compliance-oriented implementation helper, not legal advice. Review your final configuration with counsel for the regions where you operate.
 
+The hosted builder lives at `https://privacy.js.gripe/`. It opens in a simplified view for everyday banner copy, preview, and embed code. Switch to Advanced when you need to edit required-service disclosures, optional plugins, imports, or raw JSON.
+
 ## What It Does
 
 - Shows a first-run privacy choices banner.
@@ -21,23 +23,30 @@ This is a compliance-oriented implementation helper, not legal advice. Review yo
 
 The deployable files are in `public/`:
 
+- `index.html`
+- `builder.css`
+- `builder.js`
+- `demo.html`
 - `privacy-plugin-loader.js`
 - `privacy-plugin-banner.css`
 - `privacy-plugins.json`
+- `_headers`
 
 ## Quick Deploy
 
-Copy the three files from `public/` to your site's public/static directory, then add the loader before `</body>`:
+The simplest integration is to reference the hosted loader before `</body>`:
 
 ```html
-<script src="/privacy-plugin-loader.js?v=20260520v9" defer></script>
+<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1" defer></script>
 ```
 
-If the config and stylesheet live somewhere else, pass their URLs explicitly:
+When loaded from `privacy.js.gripe`, the loader automatically fetches `https://privacy.js.gripe/privacy-plugins.json` and `https://privacy.js.gripe/privacy-plugin-banner.css`.
+
+If you self-host the files or keep a site-specific config somewhere else, pass URLs explicitly:
 
 ```html
 <script
-  src="/assets/privacy-plugin-loader.js?v=20260520v9"
+  src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1"
   data-config="/assets/privacy-plugins.json"
   data-stylesheet="/assets/privacy-plugin-banner.css"
   defer
@@ -48,17 +57,22 @@ Use a version query string when you deploy a new banner build so browsers and CD
 
 ## 中文快速使用
 
-`mycookies` 可以作为普通静态资源部署，不依赖框架。把 `public/` 目录下的三个文件复制到站点可公开访问的静态目录，然后在页面底部加载：
+`mycookies` 可以直接使用线上版本，不依赖框架。先在 `https://privacy.js.gripe/` 可视化编辑 banner 内容、必要项目和可选插件，再把生成的 `privacy-plugins.json` 发布到 `privacy.js.gripe` 的静态文件中。业务站点只需要在页面底部引用：
 
 ```html
-<script src="/privacy-plugin-loader.js?v=20260520v9" defer></script>
+<script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1" defer></script>
 ```
 
-如果你的配置文件或样式文件不在站点根目录，用 `data-config` 和 `data-stylesheet` 指定路径：
+默认情况下，loader 会自动从同一域名读取：
+
+- `https://privacy.js.gripe/privacy-plugins.json`
+- `https://privacy.js.gripe/privacy-plugin-banner.css`
+
+如果你的配置文件或样式文件不在 `privacy.js.gripe`，用 `data-config` 和 `data-stylesheet` 指定路径：
 
 ```html
 <script
-  src="https://example.com/privacy-plugin-loader.js?v=20260520v9"
+  src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v1"
   data-config="https://example.com/privacy-plugins.json"
   data-stylesheet="https://example.com/privacy-plugin-banner.css"
   defer
@@ -258,6 +272,26 @@ window.JSGripePrivacy.reset();
 ```
 
 Use `openPreferences()` from a footer "Privacy settings" link if you prefer a custom trigger.
+
+## Screenshots
+
+### Visual Builder
+
+![Visual builder](docs/screenshots/builder.png)
+
+### Demo Banner
+
+![Demo banner](docs/screenshots/demo-banner.png)
+
+### Demo Preference Center
+
+![Demo preference center](docs/screenshots/demo-preferences.png)
+
+### GPC/DNT Preference Center
+
+This screenshot is captured with `navigator.globalPrivacyControl === true`. Required services are disclosed separately, and analytics remains optional and selectable.
+
+![GPC preference center](docs/screenshots/demo-gpc-preferences.png)
 
 ## Check
 
