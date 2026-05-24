@@ -90,6 +90,9 @@ try {
 
   await page.locator("[data-select='cloudflare-web-analytics']").click();
   await page.locator("input[name='componentToken']").fill("TEST_TOKEN");
+  await page.locator("input[name='componentName']").fill("Cloudflare Analytics Edited");
+  await page.locator("#save-component").click();
+  await expectText(page.locator("[data-select='cloudflare-web-analytics']"), "Cloudflare Analytics Edited");
   await page.locator("#open-export").click();
   await page.waitForSelector("#export-dialog[open]", { timeout: 4000 });
   const tokenConfigText = await page.locator("#config-json").inputValue();
@@ -133,10 +136,13 @@ try {
   await page.locator("input[name='componentSrc']").fill("");
   await expectText(page.locator("#validation-status"), "需修正");
   await expectText(page.locator("#validation-list"), "脚本地址");
+  await page.locator("#delete-component").click();
+  assert.equal(await page.locator("#component-list .component-card").count(), beforeCount);
+  await expectText(page.locator("#validation-status"), "有效");
 
   await page.locator("[data-lang='en']").click();
   await expectText(page.locator("h1"), "Privacy Banner Builder");
-  await expectText(page.locator("#validation-status"), "Needs fixes");
+  await expectText(page.locator("#validation-status"), "Valid");
 
   console.log("Builder interaction smoke test passed.");
 } finally {

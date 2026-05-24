@@ -20,6 +20,8 @@ const chromeCopy = {
     category: "类别",
     componentToken: "组件 token（可选）",
     componentTokenHint: "按组件提供方要求填写；不需要 token 的组件可留空。",
+    saveComponent: "保存组件",
+    deleteComponent: "删除组件",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "标题",
     bannerMessageLabel: "说明",
@@ -73,6 +75,8 @@ const chromeCopy = {
     category: "類別",
     componentToken: "組件 token（可選）",
     componentTokenHint: "依組件提供方要求填寫；不需要 token 的組件可留空。",
+    saveComponent: "儲存組件",
+    deleteComponent: "刪除組件",
     bannerCopy: "Banner 文案",
     bannerTitleLabel: "標題",
     bannerMessageLabel: "說明",
@@ -126,6 +130,8 @@ const chromeCopy = {
     category: "Category",
     componentToken: "Component token (optional)",
     componentTokenHint: "Fill only when the component provider requires one; leave blank otherwise.",
+    saveComponent: "Save component",
+    deleteComponent: "Delete component",
     bannerCopy: "Banner copy",
     bannerTitleLabel: "Title",
     bannerMessageLabel: "Description",
@@ -282,6 +288,7 @@ const validationList = document.querySelector("#validation-list");
 const validationSource = document.querySelector("#validation-source");
 const validationRequiredCount = document.querySelector("#validation-required-count");
 const validationOptionalCount = document.querySelector("#validation-optional-count");
+const deleteComponentButton = document.querySelector("#delete-component");
 
 function detectLang() {
   if (typeof navigator === "undefined") return "zh-CN";
@@ -400,6 +407,7 @@ function renderComponentList() {
 function renderForm() {
   const component = selectedComponent();
   if (!component) return;
+  deleteComponentButton.disabled = state.components.length <= 1;
   form.dataset.kind = component.kind;
   form.elements.componentKind.value = component.kind;
   form.elements.componentName.value = component.name || "";
@@ -537,6 +545,16 @@ function addComponent(kind) {
   refresh();
 }
 
+function deleteSelectedComponent() {
+  if (state.components.length <= 1) return;
+  const index = state.components.findIndex((component) => component.id === state.selectedId);
+  if (index < 0) return;
+  state.components.splice(index, 1);
+  state.selectedId = state.components[Math.min(index, state.components.length - 1)]?.id || state.components[0]?.id || "";
+  renderForm();
+  refresh();
+}
+
 function importConfig(config) {
   state.ui = { ...structuredClone(copyDefaults), ...(config.ui || {}) };
   state.components = [
@@ -586,6 +604,12 @@ form.addEventListener("input", () => {
 
 document.querySelector("#add-required").addEventListener("click", () => addComponent("required"));
 document.querySelector("#add-optional").addEventListener("click", () => addComponent("optional"));
+document.querySelector("#save-component").addEventListener("click", () => {
+  syncFormToState();
+  renderForm();
+  refresh();
+});
+deleteComponentButton.addEventListener("click", deleteSelectedComponent);
 document.querySelector("#reset-demo").addEventListener("click", () => {
   localStorage.removeItem("mycookies_builder_state_v2");
   window.location.reload();
