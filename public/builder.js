@@ -269,6 +269,8 @@ const state = {
     }
   ]
 };
+const builderStorageKey = "privacy_js_gripe_builder_state_v1";
+const legacyBuilderStorageKey = "mycookies_builder_state_v2";
 
 const form = document.querySelector("#component-form");
 const componentList = document.querySelector("#component-list");
@@ -507,17 +509,23 @@ function refresh() {
   renderComponentList();
   renderPreview(config);
   renderValidation(validateConfig(config), "previewFromBuilder");
-  localStorage.setItem("mycookies_builder_state_v2", JSON.stringify(state));
+  localStorage.setItem(builderStorageKey, JSON.stringify(state));
+  localStorage.removeItem(legacyBuilderStorageKey);
 }
 
 function loadSavedState() {
-  const saved = localStorage.getItem("mycookies_builder_state_v2");
+  const saved = localStorage.getItem(builderStorageKey) || localStorage.getItem(legacyBuilderStorageKey);
   if (!saved) return;
   try {
     const parsed = JSON.parse(saved);
-    if (Array.isArray(parsed.components)) Object.assign(state, parsed);
+    if (Array.isArray(parsed.components)) {
+      Object.assign(state, parsed);
+      localStorage.setItem(builderStorageKey, JSON.stringify(state));
+      localStorage.removeItem(legacyBuilderStorageKey);
+    }
   } catch {
-    localStorage.removeItem("mycookies_builder_state_v2");
+    localStorage.removeItem(builderStorageKey);
+    localStorage.removeItem(legacyBuilderStorageKey);
   }
 }
 
@@ -599,7 +607,8 @@ form.addEventListener("input", () => {
 document.querySelector("#add-component").addEventListener("click", () => addComponent("optional"));
 deleteComponentButton.addEventListener("click", deleteSelectedComponent);
 document.querySelector("#reset-demo").addEventListener("click", () => {
-  localStorage.removeItem("mycookies_builder_state_v2");
+  localStorage.removeItem(builderStorageKey);
+  localStorage.removeItem(legacyBuilderStorageKey);
   window.location.reload();
 });
 

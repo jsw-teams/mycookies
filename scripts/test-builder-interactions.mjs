@@ -73,7 +73,7 @@ try {
   await page.waitForSelector("#component-list .component-card", { timeout: 8000 });
   await page.locator("[data-lang='zh-CN']").click();
 
-  assert.equal(await page.locator("text=mycookies").count(), 0, "Project name should not be visible in builder UI");
+  assert.equal(await page.locator("text=mycookies").count(), 0, "Legacy project name should not be visible in builder UI");
   await expectText(page.locator("h1"), "隐私 Banner 构建器");
   await expectText(page.locator("#validation-status"), "有效");
   await expectText(page.locator("#validation-source"), "构建器表单");

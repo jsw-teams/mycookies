@@ -7,6 +7,7 @@
   const legacyStorageKeys = ["privacy_plugins_consent_v3"];
   const regionKey = "privacy_plugins_region_v1";
   const globalStateKey = "__jsGripePrivacyPlugins";
+  const cookieMaxAge = 60 * 60 * 24 * 180;
   const consentRegionCodes = new Set([
     "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR",
     "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK",
@@ -144,20 +145,82 @@
     return normalizeLang(languages[0]) || "en";
   };
   let activeLang = browserLang();
-  const readJson = (key) => {
+
+  function cookieAttributes(maxAge = cookieMaxAge) {
+    const secure = window.location.protocol === "https:" ? "; secure" : "";
+    return `; path=/; max-age=${maxAge}; samesite=lax${secure}`;
+  }
+
+  function readCookie(name) {
+    const encodedName = `${encodeURIComponent(name)}=`;
+    const match = document.cookie
+      .split(";")
+      .map((item) => item.trim())
+      .find((item) => item.startsWith(encodedName));
+    if (!match) return "";
+    try {
+      return decodeURIComponent(match.slice(encodedName.length));
+    } catch {
+      return "";
+    }
+  }
+
+  function writeCookie(name, value) {
+    document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}${cookieAttributes()}`;
+  }
+
+  function deleteCookie(name) {
+    document.cookie = `${encodeURIComponent(name)}=${cookieAttributes(0)}`;
+  }
+
+  function readLocalJson(key) {
     try {
       return JSON.parse(localStorage.getItem(key) || "null");
     } catch {
       return null;
     }
-  };
-  const writeJson = (key, value) => {
+  }
+
+  function removeLocalJson(key) {
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      localStorage.removeItem(key);
     } catch {
       /* Ignore private-mode storage errors. */
     }
-  };
+  }
+
+  function readJson(key) {
+    const cookieValue = readCookie(key);
+    if (cookieValue) {
+      try {
+        return JSON.parse(cookieValue);
+      } catch {
+        deleteCookie(key);
+        return null;
+      }
+    }
+
+    const legacyValue = readLocalJson(key);
+    if (legacyValue) {
+      writeJson(key, legacyValue);
+      removeLocalJson(key);
+    }
+    return legacyValue;
+  }
+
+  function writeJson(key, value) {
+    try {
+      writeCookie(key, JSON.stringify(value));
+    } catch {
+      /* Ignore cookie serialization errors. */
+    }
+    removeLocalJson(key);
+  }
+
+  function removeJson(key) {
+    deleteCookie(key);
+    removeLocalJson(key);
+  }
 
   function hasGlobalOptOut() {
     return navigator.globalPrivacyControl === true || navigator.doNotTrack === "1" || window.doNotTrack === "1";
@@ -320,13 +383,7 @@
       version: 4
     };
     writeJson(storageKey, value);
-    legacyStorageKeys.forEach((key) => {
-      try {
-        localStorage.removeItem(key);
-      } catch {
-        /* Ignore private-mode storage errors. */
-      }
-    });
+    legacyStorageKeys.forEach(removeJson);
     return value;
   }
 
@@ -604,13 +661,7 @@
     window.JSGripePrivacy = {
       openPreferences: () => showPreferenceCenter(config, context),
       reset: () => {
-        [storageKey, ...legacyStorageKeys].forEach((key) => {
-          try {
-            localStorage.removeItem(key);
-          } catch {
-            /* Ignore private-mode storage errors. */
-          }
-        });
+        [storageKey, ...legacyStorageKeys].forEach(removeJson);
         document.querySelectorAll("[data-privacy-root],[data-privacy-settings]").forEach((node) => node.remove());
         showBanner(config, context);
       }

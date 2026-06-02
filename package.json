@@ -1,11 +1,12 @@
 {
-  "name": "mycookies",
+  "name": "privacy-js-gripe",
   "version": "0.1.0",
   "private": false,
   "type": "module",
   "scripts": {
     "capture:smoke": "node scripts/capture-smoke-screenshots.mjs",
     "check": "node --check public/privacy-plugin-loader.js && node --check public/builder.js && node --check scripts/test-builder-interactions.mjs && node -e \"JSON.parse(require('fs').readFileSync('public/privacy-plugins.json', 'utf8'))\"",
+    "sync": "node scripts/sync-to-projects.mjs",
     "test:builder": "node scripts/test-builder-interactions.mjs"
   }
 }

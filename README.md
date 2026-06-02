@@ -1,6 +1,6 @@
-# mycookies
+# privacy-js-gripe
 
-`mycookies` is a small, dependency-free privacy banner controller for static sites and web apps. It gates optional third-party scripts, stores the visitor's choice in `localStorage`, provides a preference center, and includes accessible dialog markup and keyboard behavior.
+`privacy-js-gripe` is a small, dependency-free privacy banner controller for static sites and web apps. It gates optional third-party scripts, stores the visitor's choice in first-party cookies, provides a preference center, and includes accessible dialog markup and keyboard behavior.
 
 It was built for the JS.Gripe sites, but the public files in this repository can be deployed on any static host.
 
@@ -12,8 +12,8 @@ The hosted builder lives at `https://privacy.js.gripe/`. It opens as a single-co
 - Lets visitors keep only required services, accept all, or manage preferences by category.
 - Loads optional scripts only after the matching category is accepted.
 - Displays required services separately from optional categories, so visitors can see what is necessary for site operation.
-- Stores consent in `privacy_plugins_consent_v4`.
-- Migrates all-off legacy `privacy_plugins_consent_v3` choices.
+- Stores consent in the first-party `privacy_plugins_consent_v4` cookie.
+- Migrates all-off legacy `privacy_plugins_consent_v3` choices from older browser storage.
 - Detects Global Privacy Control and Do Not Track as an opt-out signal, so optional plugins start off by default.
 - Keeps analytics as an optional category under GPC/DNT: it is still labeled optional and can still be changed in the preference center.
 - Avoids initial auto-focus on banner buttons, so the first paint does not show a blue focus ring on "Only necessary" or other actions.
@@ -61,7 +61,7 @@ Use a version query string when you deploy a new banner build so browsers and CD
 
 ## 中文快速使用
 
-`mycookies` 可以直接使用线上版本，不依赖框架。先在 `https://privacy.js.gripe/` 可视化编辑 banner 内容、必要项目和可选插件，再把生成的 `privacy-plugins.json` 发布到 `privacy.js.gripe` 的静态文件中。业务站点只需要在页面底部引用：
+`privacy-js-gripe` 可以直接使用线上版本，不依赖框架。先在 `https://privacy.js.gripe/` 可视化编辑 banner 内容、必要项目和可选插件，再把生成的 `privacy-plugins.json` 发布到 `privacy.js.gripe` 的静态文件中。业务站点只需要在页面底部引用：
 
 ```html
 <script src="https://privacy.js.gripe/privacy-plugin-loader.js?v=20260524v2" defer></script>
@@ -238,7 +238,7 @@ This avoids turning analytics into an unchangeable "Required" item while still r
 
 ## Required Services
 
-Some jurisdictions and regulators expect clear disclosure of storage/access that is necessary for the requested service, even when consent is not requested for those items. `mycookies` supports this with `requiredServices`.
+Some jurisdictions and regulators expect clear disclosure of storage/access that is necessary for the requested service, even when consent is not requested for those items. `privacy-js-gripe` supports this with `requiredServices`.
 
 Required services are shown in the preference center as checked and disabled. They are separate from optional categories such as analytics. Use them only for genuinely necessary purposes such as:
 
@@ -299,7 +299,7 @@ Use `openPreferences()` from a footer "Privacy settings" link if you prefer a cu
 Inside this monorepo/server layout, run:
 
 ```bash
-cd /opt/mycookies
+cd /opt/privacy-js-gripe
 npm run sync
 ```
 
@@ -326,12 +326,12 @@ Each JS.Gripe project also has a `sync:cookies` script that calls the same share
 Run:
 
 ```bash
-cd /opt/mycookies
+cd /opt/privacy-js-gripe
 npm run check
 npm run capture:smoke
 ```
 
-`capture:smoke` starts the public demo page, clears consent storage, and captures banner and preference-center screenshots.
+`capture:smoke` starts the public demo page, clears consent cookies and legacy storage, and captures banner and preference-center screenshots.
 
 Screenshots are written to `docs/screenshots/`.
 
@@ -360,7 +360,7 @@ This screenshot is captured with `navigator.globalPrivacyControl === true`. Requ
 The controller uses modern browser APIs available in current evergreen browsers:
 
 - `fetch`
-- `localStorage`
+- first-party cookies via `document.cookie`
 - `dataset`
 - optional chaining
 - `Intl.DateTimeFormat().resolvedOptions().timeZone`

@@ -95,15 +95,20 @@ async function waitForBanner(page) {
   await page.waitForSelector(".privacy-plugin-banner", { timeout: 8000 });
 }
 
+async function clearConsentStorage(page) {
+  await page.evaluate(() => {
+    ["privacy_plugins_consent_v4", "privacy_plugins_consent_v3", "privacy_plugins_region_v1"].forEach((key) => {
+      localStorage.removeItem(key);
+      document.cookie = `${encodeURIComponent(key)}=; path=/; max-age=0; samesite=lax`;
+    });
+  });
+}
+
 async function captureApp(page, preview) {
   const baseUrl = `http://127.0.0.1:${preview.port}`;
   console.log(`Capturing ${preview.id} banner...`);
   await page.goto(`${baseUrl}${preview.url}`, { waitUntil: "networkidle" });
-  await page.evaluate(() => {
-    localStorage.removeItem("privacy_plugins_consent_v4");
-    localStorage.removeItem("privacy_plugins_consent_v3");
-    localStorage.removeItem("privacy_plugins_region_v1");
-  });
+  await clearConsentStorage(page);
   await page.reload({ waitUntil: "networkidle" });
   try {
     await waitForBanner(page);
@@ -125,11 +130,7 @@ async function capturePreferenceCenter(page, preview) {
   const baseUrl = `http://127.0.0.1:${preview.port}`;
   console.log(`Capturing ${preview.id} preference center...`);
   await page.goto(`${baseUrl}${preview.url}`, { waitUntil: "networkidle" });
-  await page.evaluate(() => {
-    localStorage.removeItem("privacy_plugins_consent_v4");
-    localStorage.removeItem("privacy_plugins_consent_v3");
-    localStorage.removeItem("privacy_plugins_region_v1");
-  });
+  await clearConsentStorage(page);
   await page.reload({ waitUntil: "networkidle" });
   await waitForBanner(page);
   await page.locator("[data-privacy-action='customize']").click();
@@ -150,11 +151,7 @@ async function captureGlobalOptOutPreferenceCenter(page, preview) {
     });
   });
   await page.goto(`${baseUrl}${preview.url}`, { waitUntil: "networkidle" });
-  await page.evaluate(() => {
-    localStorage.removeItem("privacy_plugins_consent_v4");
-    localStorage.removeItem("privacy_plugins_consent_v3");
-    localStorage.removeItem("privacy_plugins_region_v1");
-  });
+  await clearConsentStorage(page);
   await page.reload({ waitUntil: "networkidle" });
   await waitForBanner(page);
   await page.locator("[data-privacy-action='customize']").click();
